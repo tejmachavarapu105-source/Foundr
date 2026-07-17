@@ -1,9 +1,12 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
+
+# Copy Prisma schema BEFORE npm ci
+COPY prisma ./prisma
 RUN npm ci
 COPY . .
-RUN npx prisma generate && npm run build
+RUN npm run build
 
 FROM node:20-alpine
 WORKDIR /app
