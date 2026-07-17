@@ -8,7 +8,7 @@ COPY package*.json ./
 # Prisma schema must exist before npm ci
 COPY prisma ./prisma
 
-RUN npm ci
+RUN npm install
 
 COPY . .
 
