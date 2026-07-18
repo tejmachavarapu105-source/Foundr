@@ -25,33 +25,22 @@ export async function bootstrapApp() {
 }
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  
-  // These global configs apply to both Railway and Vercel
-  app.enableCors();
-  app.setGlobalPrefix('api');
-  app.useGlobalPipes(
-    new ValidationPipe({ 
-      whitelist: true, 
-      forbidNonWhitelisted: true, 
-      transform: true 
-    })
-  );
-  
-  // Run app.listen() if we are NOT on Vercel OR explicitly running on Railway
-  const isVercel = !!process.env.VERCEL;
-  const isRailway = !!process.env.RAILWAY_STATIC_URL || !!process.env.PORT;
-
-  if (!isVercel || isRailway) {
+  // Only start a listening server if we are running locally, not on Vercel
+  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    const app = await NestFactory.create(AppModule);
+    app.enableCors();
+    app.setGlobalPrefix('api');
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true })
+    );
+    
     const port = Number(process.env.PORT ?? 3000);
-    // 0.0.0.0 is critical for Railway containers to expose the port internally
     await app.listen(port, '0.0.0.0');
-    console.log(`Server listener initialized on port ${port}`);
+    console.log(`API listening locally on http://localhost:${port}/api`);
   }
 }
 
 bootstrap();
-
 
 // ==========================================================
 // 🎯 FIXED: THE VERCEL SERVERLESS BRIDGE HANDLER WITH PROXY
