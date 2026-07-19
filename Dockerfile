@@ -18,6 +18,8 @@ RUN npm run build
 # ---------- Production Stage ----------
 FROM node:22-alpine
 
+RUN apk add --no-cache openssl1.1
+
 WORKDIR /app
 
 ENV NODE_ENV=production
